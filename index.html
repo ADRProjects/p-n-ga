@@ -176,6 +176,72 @@ button {
     background-color: transparent !important;
     color: white;
 }
+/* Fix the Buscar Button */
+.btn-locate {
+    background: #1e293b; /* Solid dark slate so white text pops */
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-locate:hover {
+    background: #334155;
+}
+
+/* Mobile Responsiveness (Crucial for cellphones) */
+@media (max-width: 600px) {
+    #dashboard {
+        width: 90%;
+        flex-direction: column; /* Stacks items vertically on small screens */
+        bottom: 20px;
+        padding: 16px;
+        text-align: center;
+    }
+    
+    #dashboard .post-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-locate, .btn-delete {
+        width: 100%;
+        padding: 12px; /* Taller buttons for easy thumb tapping */
+    }
+}
+/* Modern Toast Notification */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.custom-toast {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    color: #f8fafc;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    animation: slideDown 0.3s ease forwards;
+    opacity: 0;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
@@ -263,7 +329,7 @@ button {
     document.getElementById('btn-delete-mine').onclick = async () => {
         if(confirm("¿Seguro que quieres borrar tu pin asere?")) {
             await supabase.from('pins').delete().eq('user_id', currentUser.id);
-            alert("Pin borrado. Ya puedes poner otro.");
+            showToast("Pin borrado. Ya puedes poner otro.");
             loadPins();
         }
     };
@@ -274,6 +340,7 @@ button {
             if (markers[myActivePin.id]) markers[myActivePin.id].togglePopup();
         }
     };
+    
 
     async function loadPins() {
         const { data: pins, error } = await supabase
@@ -302,9 +369,11 @@ button {
                 .addTo(map);
             
             // PREVENT CLICK BUBBLING
+            // PREVENT CLICK BUBBLING & FORCE POPUP TO OPEN
             const markerElement = marker.getElement();
             markerElement.addEventListener('click', (e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Stops the map from registering a click
+                marker.togglePopup(); // Opens the message bubble over the pin
             });
 
             markers[pin.id] = marker;
@@ -327,6 +396,28 @@ button {
         updateDashboardUI();
         updateTicker(pins.slice(0, 10));
     }
+    function showToast(message) {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast';
+    toast.innerText = message;
+    container.appendChild(toast);
+    
+    // Auto-remove after 3.5 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
 
     function updateDashboardUI() {
         const dashboard = document.getElementById('my-dashboard');
@@ -355,11 +446,11 @@ button {
     }
 
     map.on('click', async (e) => {
-        if (!currentUser) return alert("Cargando el mapa, espera un segundo...");
-        if (myActivePin) return alert("Ya tienes un pin activo. Bórralo en tu panel para poner uno nuevo.");
+        if (!currentUser) return showToast("Cargando el mapa, espera un segundo...");
+        if (myActivePin) return showToast("Ya tienes un pin activo. Bórralo en tu panel para poner uno nuevo.");
 
         if (!turf.booleanPointInPolygon(turf.point([e.lngLat.lng, e.lngLat.lat]), cubaBounds)) {
-            return alert("¡Oye! El pin tiene que caer en Cuba, no en el yuma ni en el agua.");
+            return showToast("¡Oye! El pin tiene que caer en Cuba, no en el yuma ni en el agua.");
         }
 
         const msg = prompt("Suelta tu mensaje (Max 128 letras):");
