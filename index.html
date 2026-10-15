@@ -4,22 +4,15 @@
     <meta charset="utf-8">
     <title>P📍n-ga | El mapa caliente de Cuba</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-   <!-- Standard Meta -->
-    <meta name="description" content="¡Qué bolá! P📍n-ga es el mapa interactivo pa' dejar tus mensajes por toda Cuba.">
     
     <!-- Open Graph / Facebook / WhatsApp -->
+    <meta name="description" content="¡Qué bolá! P📍n-ga es el mapa interactivo pa' dejar tus mensajes por toda Cuba.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://adrprojects.github.io/p-n-ga/">
     <meta property="og:title" content="P📍n-ga | El mapa caliente de Cuba">
     <meta property="og:description" content="¡Qué bolá! P📍n-ga es el mapa interactivo pa' dejar tus mensajes por toda Cuba. Un pin. 128 letras. 24 horas.">
     <meta property="og:image" content="https://adrprojects.github.io/p-n-ga/og-image.jpg">
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://adrprojects.github.io/p-n-ga/">
-    <meta name="twitter:title" content="P📍n-ga | El mapa caliente de Cuba">
-    <meta name="twitter:description" content="¡Qué bolá! P📍n-ga es el mapa interactivo pa' dejar tus mensajes por toda Cuba. Un pin. 128 letras. 24 horas.">
-    <meta name="twitter:image" content="https://adrprojects.github.io/p-n-ga/og-image.jpg">
     
     <!-- MapLibre & Turf.js -->
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
@@ -28,262 +21,155 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        
-        body { margin: 0; padding: 0; display: flex; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; overflow: hidden; background: #fff; }
-        
-        #ticker-container { position: fixed; top: 0; left: 320px; right: 0; height: 35px; background: #111827; color: #f3f4f6; overflow: hidden; white-space: nowrap; display: flex; align-items: center; z-index: 1000; font-size: 13px; border-bottom: 2px solid #ef4444; }
-        .ticker-track { display: inline-block; padding-left: 100%; animation: marquee 40s linear infinite; }
-        .ticker-track:hover { animation-play-state: paused; }
-        .ticker-item { display: inline-block; margin-right: 50px; cursor: pointer; }
-        .ticker-item:hover { color: #60a5fa; text-decoration: underline; }
-        .ticker-time { color: #9ca3af; font-size: 11px; margin-left: 6px; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-        #sidebar { width: 320px; background: #fafafa; border-right: 1px solid #ddd; display: flex; flex-direction: column; z-index: 10; }
-        .header { padding: 20px; background: white; border-bottom: 1px solid #ddd; }
-        .header h1 { margin: 0 0 10px 0; font-size: 24px; color: #111; letter-spacing: -0.5px; }
-        
-        .btn { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 8px; font-size: 14px; transition: 0.2s; }
-        .btn-locate { background: #3b82f6; color: white; }
-        .btn-delete { background: #ef4444; color: white; }
-        .btn:hover { opacity: 0.9; }
-
-        #my-dashboard { background: #fef2f2; border: 2px solid #fca5a5; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; }
-        #my-dashboard h3 { margin: 0 0 8px 0; font-size: 14px; color: #991b1b; }
-        #my-pin-msg { font-size: 14px; font-weight: bold; margin: 0 0 5px 0; }
-        #my-pin-time { font-size: 12px; color: #666; display: block; margin-bottom: 10px; }
-        .dash-actions { display: flex; gap: 8px; }
-
-        .feed { flex-grow: 1; overflow-y: auto; padding: 15px; }
-        .post-card { background: white; padding: 14px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eee; transition: 0.2s; }
-        .post-card:hover { border-color: #999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .post-msg { font-size: 14px; margin: 0 0 8px 0; word-break: break-word; color: #111; line-height: 1.4; }
-        .post-time { font-size: 11px; color: #666; font-weight: 500; }
-        
-        #map { flex-grow: 1; margin-top: 35px; }
-        .map-popup h3 { margin: 0 0 8px 0; font-size: 15px; line-height: 1.3; }
-        .map-popup span { font-size: 11px; color: #666; font-weight: bold; }
-        /* Base Map styling */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif; /* Modern, clean font */
-    background-color: #0f172a;
-}
-#map {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-}
-
-/* ------------------------------------
-   Sleek Glassmorphism Dashboard 
------------------------------------- */
-#dashboard {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.75); /* Dark slate with transparency */
-    backdrop-filter: blur(12px); /* Apple-style glass blur */
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    padding: 16px 24px;
-    color: #f8fafc;
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    transition: all 0.3s ease;
-}
-
-#dashboard p {
-    margin: 0;
-    font-weight: 400;
-    font-size: 14px;
-}
-
-#dashboard span {
-    font-weight: 600;
-    color: #38bdf8; /* Neon blue accent for the active pin text */
-}
-
-/* Modern Pill Buttons */
-button {
-    font-family: 'Inter', sans-serif;
-    border: none;
-    border-radius: 50px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-locate {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-locate:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.btn-delete {
-    background: linear-gradient(135deg, #ef4444, #b91c1c); /* Red gradient */
-    color: white;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-}
-
-.btn-delete:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
-}
-
-/* ------------------------------------
-   Custom MapLibre Popups 
------------------------------------- */
-.maplibregl-popup-content {
-    background: rgba(15, 23, 42, 0.9) !important;
-    backdrop-filter: blur(8px);
-    color: #f8fafc !important;
-    border-radius: 14px !important;
-    padding: 16px 20px !important;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Color the little triangle pointing to the pin */
-.maplibregl-popup-tip {
-    border-top-color: rgba(15, 23, 42, 0.9) !important;
-}
-
-/* Make the default X close button look decent */
-.maplibregl-popup-close-button {
-    color: #94a3b8;
-    font-size: 18px;
-    padding: 4px 8px;
-}
-
-.maplibregl-popup-close-button:hover {
-    background-color: transparent !important;
-    color: white;
-}
-/* Fix the Buscar Button */
-.btn-locate {
-    background: #1e293b; /* Solid dark slate so white text pops */
-    color: #ffffff;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-locate:hover {
-    background: #334155;
-}
-
-/* Mobile Responsiveness (Crucial for cellphones) */
-@media (max-width: 600px) {
-    #dashboard {
-        width: 90%;
-        flex-direction: column; /* Stacks items vertically on small screens */
-        bottom: 20px;
-        padding: 16px;
-        text-align: center;
-    }
-    
-    #dashboard .post-card {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .btn-locate, .btn-delete {
-        width: 100%;
-        padding: 12px; /* Taller buttons for easy thumb tapping */
-    }
-}
-/* Modern Toast Notification */
-.toast-container {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 90%;
-    max-width: 400px;
-}
-
-.custom-toast {
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(12px);
-    color: #f8fafc;
-    padding: 16px 20px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    animation: slideDown 0.3s ease forwards;
-    opacity: 0;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            #ticker-container { left: 0; }
-            #sidebar { width: 100%; height: 45vh; order: 2; border-right: none; border-top: 1px solid #ddd; }
-            #map { width: 100%; height: 55vh; order: 1; margin-top: 35px; }
+        /* 1. Full Screen Layout */
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: #0f172a; 
+            font-family: 'Inter', sans-serif; 
         }
+
+        #map { 
+            position: absolute !important; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1; 
+        }
+
+        /* 2. Glassmorphism Top Header */
+        #top-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        #top-bar h1 { margin: 0 0 5px 0; font-size: 24px; color: white; }
+        #top-bar p { margin: 5px 0; font-size: 13px; color: #94a3b8; }
+        .status-text { color: #10b981 !important; font-weight: bold; }
+
+        /* 3. Glassmorphism Bottom Dashboard */
+        #dashboard {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 16px 24px;
+            color: #f8fafc;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none; /* Hidden until a pin is active */
+            flex-direction: column;
+            gap: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        #dashboard h3 { margin: 0; font-size: 14px; color: #38bdf8; }
+        #my-pin-msg { font-size: 16px; margin: 0; font-weight: 600; word-break: break-word; }
+        #my-pin-time { font-size: 12px; color: #94a3b8; }
+
+        .dash-actions { display: flex; gap: 10px; width: 100%; }
+        
+        button {
+            flex: 1;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            border-radius: 50px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-locate { background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-locate:hover { background: #334155; }
+        .btn-delete { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
+        .btn-delete:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6); }
+
+        /* 4. Map Popups */
+        .maplibregl-popup-content {
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(8px);
+            color: #f8fafc !important;
+            border-radius: 14px !important;
+            padding: 16px 20px !important;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .maplibregl-popup-tip { border-top-color: rgba(15, 23, 42, 0.9) !important; }
+        .map-popup h3 { margin: 0 0 8px 0; font-size: 15px; }
+        .map-popup span { font-size: 11px; color: #94a3b8; }
+
+        /* 5. Toasts */
+        .toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+            width: 90%; max-width: 400px;
+        }
+        .custom-toast {
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px);
+            color: #f8fafc; padding: 16px 20px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            font-size: 14px; font-weight: 500; text-align: center;
+            animation: slideDown 0.3s ease forwards; opacity: 0;
+        }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div id="ticker-container">
-    <div id="ticker-track" class="ticker-track">Cargando la bola...</div>
-</div>
-
-<div id="sidebar">
-    <div class="header">
+    <!-- Floating Top Header -->
+    <div id="top-bar">
         <h1>P📍n-ga</h1>
-        <p style="font-size: 12px; color: #555; margin-top: 0;">Un pin. 128 letras. 24 horas.</p>
-        <p style="font-size: 12px; color: #10b981; font-weight: bold;">🟢 Estás conectado de incógnito</p>
+        <p>Un pin. 128 letras. 24 horas.</p>
+        <p class="status-text">🟢 Estás conectado de incógnito</p>
+    </div>
 
-        <!-- Personal Dashboard -->
-        <div id="my-dashboard">
-            <h3>📍 Mi Pin Activo</h3>
-            <p id="my-pin-msg"></p>
-            <span id="my-pin-time"></span>
-            <div class="dash-actions">
-                <button id="btn-locate-mine" class="btn btn-locate" style="margin:0;">Buscar</button>
-                <button id="btn-delete-mine" class="btn btn-delete" style="margin:0;">Borrar</button>
-            </div>
+    <!-- Floating Dashboard for Active User Pin -->
+    <div id="dashboard">
+        <h3>📍 Tu Pin Activo</h3>
+        <p id="my-pin-msg"></p>
+        <span id="my-pin-time"></span>
+        <div class="dash-actions">
+            <button id="btn-locate-mine" class="btn-locate">Buscar</button>
+            <button id="btn-delete-mine" class="btn-delete">Borrar</button>
         </div>
     </div>
-    
-    <div id="feed" class="feed"></div>
-</div>
 
-<div id="map"></div>
+    <!-- The Map -->
+    <div id="map"></div>
 
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
     
-    // CONFIG: Paste your Supabase keys here
+    // CONFIG
     const supabase = createClient('https://diaxhpfqhkkhtmirooos.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpYXhocGZxaGtraHRtaXJvb29zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMTAwMDMsImV4cCI6MjEwNzU4NjAwM30.GacIBgNInWUhC_dQjoCiMR64XAqYDOdjJz9cb0AIMmY');
     let currentUser = null;
     let myActivePin = null; 
@@ -301,10 +187,12 @@ button {
         maxZoom: 20 
     });
 
+    // Add Zoom Controls (+ / -)
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
     const geolocate = new maplibregl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-        showUserHeading: true
+        trackUserLocation: true
     });
     map.addControl(geolocate, 'top-right');
 
@@ -314,23 +202,30 @@ button {
         });
     }
 
-    // Auto-login functionality
     async function initAuth() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             currentUser = session.user;
         } else {
-            // Silently create a new anonymous session on first visit
             const { data, error } = await supabase.auth.signInAnonymously();
             if (!error) currentUser = data.user;
         }
+    }
+
+    // Live Sync Listener
+    function subscribeToRealtime() {
+        supabase
+            .channel('public:pins')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'pins' }, () => {
+                loadPins(); // Reload map instantly when anyone adds or deletes a pin
+            })
+            .subscribe();
     }
 
     document.getElementById('btn-delete-mine').onclick = async () => {
         if(confirm("¿Seguro que quieres borrar tu pin asere?")) {
             await supabase.from('pins').delete().eq('user_id', currentUser.id);
             showToast("Pin borrado. Ya puedes poner otro.");
-            loadPins();
         }
     };
 
@@ -340,7 +235,6 @@ button {
             if (markers[myActivePin.id]) markers[myActivePin.id].togglePopup();
         }
     };
-    
 
     async function loadPins() {
         const { data: pins, error } = await supabase
@@ -352,7 +246,6 @@ button {
 
         Object.values(markers).forEach(m => m.remove());
         markers = {};
-        document.getElementById('feed').innerHTML = '';
         myActivePin = null;
 
         pins.forEach(pin => {
@@ -368,25 +261,13 @@ button {
                 `))
                 .addTo(map);
             
-            // PREVENT CLICK BUBBLING
-            // PREVENT CLICK BUBBLING & FORCE POPUP TO OPEN
             const markerElement = marker.getElement();
             markerElement.addEventListener('click', (e) => {
-                e.stopPropagation(); // Stops the map from registering a click
-                marker.togglePopup(); // Opens the message bubble over the pin
+                e.stopPropagation(); 
+                marker.togglePopup(); 
             });
 
             markers[pin.id] = marker;
-
-            const card = document.createElement('div');
-            card.className = 'post-card';
-            card.style.borderLeft = `5px solid ${pin.color}`;
-            card.innerHTML = `<p class="post-msg">${pin.message}</p><span class="post-time">${localTime}</span>`;
-            card.onclick = () => {
-                map.flyTo({ center: [pin.longitude, pin.latitude], zoom: 17 });
-                marker.togglePopup();
-            };
-            document.getElementById('feed').appendChild(card);
 
             if (currentUser && pin.user_id === currentUser.id) {
                 myActivePin = pin;
@@ -394,55 +275,39 @@ button {
         });
 
         updateDashboardUI();
-        updateTicker(pins.slice(0, 10));
-    }
-    function showToast(message) {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container';
-        document.body.appendChild(container);
     }
 
-    const toast = document.createElement('div');
-    toast.className = 'custom-toast';
-    toast.innerText = message;
-    container.appendChild(toast);
-    
-    // Auto-remove after 3.5 seconds
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-20px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3500);
-}
+    function showToast(message) {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        toast.innerText = message;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
 
     function updateDashboardUI() {
-        const dashboard = document.getElementById('my-dashboard');
+        const dashboard = document.getElementById('dashboard');
         if (myActivePin) {
-            dashboard.style.display = 'block';
+            dashboard.style.display = 'flex';
             document.getElementById('my-pin-msg').innerText = myActivePin.message;
             document.getElementById('my-pin-time').innerText = `Publicado: ${formatLocalTime(myActivePin.created_at)}`;
         } else {
             dashboard.style.display = 'none';
         }
-    }
-
-    function updateTicker(latestPins) {
-        const track = document.getElementById('ticker-track');
-        track.innerHTML = '';
-        latestPins.forEach(pin => {
-            const item = document.createElement('span');
-            item.className = 'ticker-item';
-            item.innerHTML = `📍 <strong>${pin.message}</strong> <span class="ticker-time">(${formatLocalTime(pin.created_at)})</span>`;
-            item.onclick = () => {
-                map.flyTo({ center: [pin.longitude, pin.latitude], zoom: 17 });
-                if(markers[pin.id]) markers[pin.id].togglePopup();
-            };
-            track.appendChild(item);
-        });
     }
 
     map.on('click', async (e) => {
@@ -462,13 +327,12 @@ button {
             user_id: currentUser.id, message: msg, color: pinColor,
             latitude: e.lngLat.lat, longitude: e.lngLat.lng
         }]);
-
-        loadPins();
     });
 
     map.on('load', async () => {
         await initAuth();
         await loadPins();
+        subscribeToRealtime();
     });
 </script>
 </body>
