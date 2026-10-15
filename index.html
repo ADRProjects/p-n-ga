@@ -318,8 +318,14 @@
             return showToast("¡Oye! El pin tiene que caer en Cuba, no en el yuma ni en el agua.");
         }
 
-        const msg = prompt("Suelta tu mensaje (Max 128 letras):");
-        if (!msg || msg.length > 128) return;
+        let msg = prompt("Suelta tu mensaje (Max 128 letras):");
+        if (!msg) return; // Stops if the user clicks cancel
+
+        // Keep asking if they go over the limit, without losing what they typed
+        while (msg.length > 128) {
+            msg = prompt(`¡Te pasaste por ${msg.length - 128} letras! Recórtalo a 128 máximo:`, msg);
+            if (!msg) return; 
+        }
 
         const pinColor = PALETTE[Math.floor(Math.random() * PALETTE.length)];
 
